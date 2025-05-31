@@ -65,7 +65,7 @@ export default function MarketDetailPage() {
   const [amount, setAmount] = useState(0);
 
   return (
-    <div className="min-h-screen bg-[#f5f7fa]">
+    <div className="min-h-screen bg-white">
       <Navbar />
       <div className="container mx-auto px-4 py-10">
         <div className="flex flex-col lg:flex-row gap-8">

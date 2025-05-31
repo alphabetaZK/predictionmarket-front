@@ -116,7 +116,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f5f7fa]">
+    <div className="min-h-screen bg-white">
       {/* Main Navbar */}
       <Navbar />
       {/* Secondary Navbar */}
@@ -130,11 +130,10 @@ export default function Home() {
         </div>
       </nav>
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-10 flex flex-col md:flex-row items-center gap-8">
+      <section className="container mx-auto px-4 py-10 flex flex-col md:flex-row items-center gap-8 relative">
         <div className="flex-1 space-y-4">
           <h1 className="text-4xl font-bold text-gray-900">Predict the Future</h1>
           <p className="text-lg text-gray-600">Place your bets on real-world questions and see the market consensus.</p>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 text-lg rounded">Start trading</Button>
         </div>
       </section>
       {/* Featured Markets */}
@@ -152,7 +151,7 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {featuredMarkets.map((m, i) => (
-            <Card key={i} className="bg-white border shadow-sm hover:shadow-lg transition-shadow">
+            <Card key={i} className="bg-white border rounded-none">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3 mb-2">
                   <a href={`/market/${i}`} className="text-sm font-medium text-blue-700 hover:underline line-clamp-2">{m.question}</a>
@@ -186,7 +185,7 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {popularMarkets.map((m, i) => (
-            <Card key={i} className="bg-white border shadow-sm hover:shadow-lg transition-shadow">
+            <Card key={i} className="bg-white border rounded-none">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3 mb-2">
                   <a href={`/market/${i}`} className="text-sm font-medium text-blue-700 hover:underline line-clamp-2">{m.question}</a>

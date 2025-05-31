@@ -6,7 +6,7 @@ import { Search } from "lucide-react";
 import Link from "next/link";
 export default function Navbar() {
   return (
-    <nav className="bg-slate-950 text-white border-b">
+    <nav className="bg-[#121212] text-white border-b">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2 font-bold text-lg">
@@ -24,7 +24,7 @@ export default function Navbar() {
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
             <Input placeholder="Search" className="pl-8 w-[200px] bg-[#1a2233] text-white border-none" />
           </div>
-          <WalletMultiButton />
+          <WalletMultiButton className="hover:bg-white" />
         </div>
       </div>
     </nav>
