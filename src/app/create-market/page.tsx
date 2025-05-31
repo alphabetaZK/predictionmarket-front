@@ -144,15 +144,15 @@ export default function CreateMarket() {
       const question = `${Math.abs(hashString(formData.question + "_question"))}field`;
       
       // Log the market ID (using questionHash as it's unique for each market)
-      console.log("📊 Market ID:", questionHash);
+      console.log("📊 Market ID:", question);
       console.log("🔍 You can view this market on Aleoscan at:", 
-        `https://testnet.aleoscan.io/program/prediction_market_paris_v5.aleo/mapping/markets/${questionHash}`);
+        `https://api.explorer.provable.com/v1/testnet/program/prediction_market_paris_v5.aleo/mapping/markets/${question}`);
 
       // Convert liquidity to microcredits (1 ALEO = 1,000,000 microcredits)
       const initialYesPrice = Math.floor(parseFloat(formData.initialLiquidity) * 1_000_000);
       const minLiquidity = 10_000_000; // 10 ALEO minimum liquidity
       const closingBlock = 30; // 30 days in blocks
-      const creationFee = 3_000_000; // 3 ALEO creation fee
+      const creationFee = 10_000_000; // 3 ALEO creation fee
 
       // Prepare inputs for the smart contract with exact types
       const inputs = [
