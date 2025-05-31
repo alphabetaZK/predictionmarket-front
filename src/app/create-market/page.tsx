@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useWallet } from "@demox-labs/aleo-wallet-adapter-react";
+import { Transaction, WalletAdapterNetwork, WalletNotConnectedError } from "@demox-labs/aleo-wallet-adapter-base";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,14 +10,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DollarSign, Users, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import { createMarket, validateMarketData, type CreateMarketData } from "@/lib/markets";
 
 const categories = [
   "US Politics", "Sports", "World Politics", "Russia/Ukraine", "Current Events", "Economics", "Science", "Technology", "Entertainment"
 ];
 
+interface CreateMarketData {
+  question: string;
+  resolutionDate: string;
+  initialLiquidity: string;
+}
+
 export default function CreateMarket() {
-  const { publicKey, connected } = useWallet();
+  const { publicKey, connected, requestTransaction, transactionStatus, transitionViewKeys, requestRecords } = useWallet();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<{
     type: 'success' | 'error' | null;
@@ -37,6 +43,40 @@ export default function CreateMarket() {
     }
   };
 
+  const validateFormData = (data: CreateMarketData): { valid: boolean; errors: string[] } => {
+    const errors: string[] = [];
+
+    if (!data.question.trim()) {
+      errors.push("Market question is required");
+    } else if (data.question.length < 10) {
+      errors.push("Market question must be at least 10 characters long");
+    }
+
+    if (!data.resolutionDate) {
+      errors.push("Resolution date is required");
+    } else {
+      const resolutionDate = new Date(data.resolutionDate);
+      const now = new Date();
+      if (resolutionDate <= now) {
+        errors.push("Resolution date must be in the future");
+      }
+    }
+
+    const liquidity = parseFloat(data.initialLiquidity);
+    if (data.initialLiquidity) {
+      if (isNaN(liquidity) || liquidity < 0) {
+        errors.push("Initial liquidity must be a positive number");
+      } else if (liquidity > 0 && liquidity < 0.001) {
+        errors.push("Initial liquidity must be at least 0.001 ALEO");
+      }
+    }
+
+    return {
+      valid: errors.length === 0,
+      errors
+    };
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
@@ -49,7 +89,7 @@ export default function CreateMarket() {
     }
 
     // Validate form data
-    const validation = validateMarketData(formData);
+    const validation = validateFormData(formData);
     if (!validation.valid) {
       setSubmitStatus({
         type: 'error',
@@ -62,34 +102,112 @@ export default function CreateMarket() {
     setSubmitStatus({ type: null, message: "" });
 
     try {
-      const result = await createMarket(formData, publicKey);
-      
-      if (result.success && result.market) {
-        setSubmitStatus({
-          type: 'success',
-          message: `Market "${result.market.question}" created successfully!`
-        });
-        
-        // Reset form after successful creation
-        setTimeout(() => {
-          setFormData({
-            question: "",
-            resolutionDate: "",
-            initialLiquidity: "",
-          });
-          setSubmitStatus({ type: null, message: "" });
-        }, 3000);
-        
-      } else {
+      if (!publicKey) throw new WalletNotConnectedError();
+
+      console.log("🔧 Starting transaction creation...");
+      console.log("🔧 Public key:", publicKey);
+      console.log("🔧 Connected:", connected);
+
+      // First, get records for credits as shown in Leo docs
+      if (!requestRecords) {
+        throw new Error("requestRecords function not available");
+      }
+
+      console.log("🗂️ Requesting records for credits...");
+      const records = await requestRecords("credits.aleo");
+      console.log("✅ Records received:", records);
+
+      if (!records || records.length === 0) {
+        console.log("⚠️ No records found, but trying anyway...");
         setSubmitStatus({
           type: 'error',
-          message: result.error || "Failed to create market"
+          message: "Warning: No credit records found, but attempting transaction anyway. If this fails, please get credits from faucet.aleo.org."
         });
+        // Don't return - continue with transaction attempt
       }
+
+      // Convert liquidity to microcredits (1 ALEO = 1,000,000 microcredits)
+      const liquidityInMicrocredits = Math.floor(parseFloat(formData.initialLiquidity) * 1_000_000);
+
+      // Create a simple hash of the question for the field input
+      const hashString = (str: string): number => {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+          const char = str.charCodeAt(i);
+          hash = ((hash << 5) - hash) + char;
+          hash = hash & hash; // Convert to 32bit integer
+        }
+        return hash;
+      };
+
+      const questionField = `${Math.abs(hashString(formData.question))}field`;
+
+      // Prepare inputs for the smart contract exactly as expected
+      // Following Leo docs pattern: our contract needs address, field, u64
+      const inputs = [
+        publicKey,                        // r0: address.private (caller address)
+        questionField,                    // r1: field.private (question hash)
+        `${liquidityInMicrocredits}u64`   // r2: u64.private (initial liquidity)
+      ];
+
+      console.log("🔧 Transaction inputs:", inputs);
+      console.log("🔧 Liquidity in microcredits:", liquidityInMicrocredits);
+      console.log("🔧 Available records count:", records.length);
+
+      // Use high fee as requested by user
+      const fee = 20_000_000; // 20 million microcredits = 20 ALEO
+
+      console.log("🔧 Creating transaction with fee:", fee);
+      const aleoTransaction = Transaction.createTransaction(
+        publicKey,
+        WalletAdapterNetwork.TestnetBeta,
+        'quoicoubeh_feur.aleo',
+        'create_market',
+        inputs,
+        fee,
+        false
+      );
+
+      console.log("🔧 Transaction created:", aleoTransaction);
+
+      if (!requestTransaction) {
+        throw new Error("Request transaction function not available");
+      }
+
+      console.log("🚀 Calling requestTransaction...");
+      const transactionId = await requestTransaction(aleoTransaction);
+      console.log("✅ Transaction ID received:", transactionId);
+
+      setSubmitStatus({
+        type: 'success',
+        message: `Market "${formData.question}" creation submitted successfully! Transaction ID: ${transactionId.slice(0, 16)}...`
+      });
+
+      // Optional: Check transaction status as shown in docs
+      if (transactionStatus) {
+        try {
+          const status = await transactionStatus(transactionId);
+          console.log("Transaction status:", status);
+        } catch (error) {
+          console.log("Could not fetch transaction status:", error);
+        }
+      }
+
+      // Reset form after successful submission
+      setTimeout(() => {
+        setFormData({
+          question: "",
+          resolutionDate: "",
+          initialLiquidity: "",
+        });
+        setSubmitStatus({ type: null, message: "" });
+      }, 5000);
+
     } catch (error) {
+      console.error("Error creating market:", error);
       setSubmitStatus({
         type: 'error',
-        message: "An unexpected error occurred"
+        message: error instanceof Error ? error.message : "An unexpected error occurred"
       });
     } finally {
       setIsSubmitting(false);
@@ -178,20 +296,23 @@ export default function CreateMarket() {
                 {/* Initial Liquidity */}
                 <div className="space-y-2">
                   <Label htmlFor="initialLiquidity" className="text-sm font-medium text-gray-700">
-                    Initial Liquidity (ALEO)
+                    Initial Liquidity (ALEO) *
                   </Label>
                   <Input
                     id="initialLiquidity"
                     type="number"
-                    placeholder="100"
+                    placeholder="0.1"
                     value={formData.initialLiquidity}
                     onChange={(e) => handleInputChange("initialLiquidity", e.target.value)}
                     className="w-full"
                     disabled={isSubmitting}
-                    min="0"
-                    step="0.01"
+                    min="0.001"
+                    step="0.001"
                   />
-                  <p className="text-xs text-gray-500">Minimum liquidity to bootstrap your market.</p>
+                  <div className="text-xs text-gray-500 space-y-1">
+                    <p>• Minimum: 0.001 ALEO</p>
+                    <p>• This provides initial market liquidity</p>
+                  </div>
                 </div>
 
                 {/* Market Preview */}
@@ -230,17 +351,17 @@ export default function CreateMarket() {
                       <Button
                         type="submit"
                         className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3"
-                        disabled={!formData.question || !formData.resolutionDate || isSubmitting}
+                        disabled={!formData.question || !formData.resolutionDate || !formData.initialLiquidity || isSubmitting}
                       >
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Creating Market...
+                            Creating Market on Blockchain...
                           </>
                         ) : (
                           <>
                             <DollarSign className="w-4 h-4 mr-2" />
-                            Create Market
+                            Create Market on Aleo
                           </>
                         )}
                       </Button>
@@ -286,6 +407,24 @@ export default function CreateMarket() {
                     <li>• Define edge cases</li>
                     <li>• Set clear deadlines</li>
                     <li>• Avoid subjective interpretations</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-2">Smart Contract Info</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Program: quoicoubeh_feur.aleo</li>
+                    <li>• Function: create_market</li>
+                    <li>• Simple 3-parameter execution</li>
+                    <li>• Creates Market.record on-chain</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-2">How It Works</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Validates caller address</li>
+                    <li>• Creates market record with your info</li>
+                    <li>• Stores on Aleo blockchain</li>
+                    <li>• Returns Market.record to you</li>
                   </ul>
                 </div>
               </div>

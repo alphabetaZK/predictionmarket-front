@@ -23,7 +23,7 @@ export default function RootLayout({
       }),
       new PuzzleWalletAdapter({
         programIdPermissions: {
-          [WalletAdapterNetwork.TestnetBeta]: ['hello_hello.aleo']
+          [WalletAdapterNetwork.TestnetBeta]: ['credits.aleo', 'quoicoubeh_feur.aleo']
         },
         appName: 'Prediction Market',
         appDescription: 'Plateforme de prédictions décentralisée',
@@ -45,6 +45,7 @@ export default function RootLayout({
         wallets={wallets}
         network={WalletAdapterNetwork.TestnetBeta}
         decryptPermission={DecryptPermission.UponRequest}
+        programs={["credits.aleo", "quoicoubeh_feur.aleo"]}
         autoConnect
       >
         <WalletModalProvider>
