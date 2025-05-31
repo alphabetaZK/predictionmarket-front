@@ -21,6 +21,8 @@ interface CreateMarketData {
   initialLiquidity: string;
 }
 
+const PREDICTION_MARKET_PROGRAM = "prediction_market_paris_v5.aleo";
+
 export default function CreateMarket() {
   const { publicKey, connected, requestTransaction, transactionStatus, transitionViewKeys, requestRecords } = useWallet();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -93,7 +95,7 @@ export default function CreateMarket() {
     if (!validation.valid) {
       setSubmitStatus({
         type: 'error',
-        message: validation.errors[0] // Show first error
+        message: validation.errors[0]
       });
       return;
     }
@@ -123,48 +125,64 @@ export default function CreateMarket() {
           type: 'error',
           message: "Warning: No credit records found, but attempting transaction anyway. If this fails, please get credits from faucet.aleo.org."
         });
-        // Don't return - continue with transaction attempt
       }
 
-      // Convert liquidity to microcredits (1 ALEO = 1,000,000 microcredits)
-      const liquidityInMicrocredits = Math.floor(parseFloat(formData.initialLiquidity) * 1_000_000);
-
-      // Create a simple hash of the question for the field input
+      // Create a hash of the question for the field input
       const hashString = (str: string): number => {
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
           const char = str.charCodeAt(i);
           hash = ((hash << 5) - hash) + char;
-          hash = hash & hash; // Convert to 32bit integer
+          hash = hash & hash;
         }
         return hash;
       };
 
-      const questionField = `${Math.abs(hashString(formData.question))}field`;
+      // Convert all string inputs to field type
+      const questionHash = `${Math.abs(hashString(formData.question))}field`;
+      const questionTitleHash = `${Math.abs(hashString(formData.question + "_title"))}field`;
+      const question = `${Math.abs(hashString(formData.question + "_question"))}field`;
+      
+      // Log the market ID (using questionHash as it's unique for each market)
+      console.log("📊 Market ID:", questionHash);
+      console.log("🔍 You can view this market on Aleoscan at:", 
+        `https://testnet.aleoscan.io/program/prediction_market_paris_v5.aleo/mapping/markets/${questionHash}`);
 
-      // Prepare inputs for the smart contract exactly as expected
-      // Following Leo docs pattern: our contract needs address, field, u64
+      // Convert liquidity to microcredits (1 ALEO = 1,000,000 microcredits)
+      const initialYesPrice = Math.floor(parseFloat(formData.initialLiquidity) * 1_000_000);
+      const minLiquidity = 10_000_000; // 10 ALEO minimum liquidity
+      const closingBlock = 30; // 30 days in blocks
+      const creationFee = 3_000_000; // 3 ALEO creation fee
+
+      // Prepare inputs for the smart contract with exact types
       const inputs = [
-        publicKey,                        // r0: address.private (caller address)
-        questionField,                    // r1: field.private (question hash)
-        `${liquidityInMicrocredits}u64`   // r2: u64.private (initial liquidity)
+        question,                // r0: question (field.private)
+        questionTitleHash,       // r1: question_title (field.private)
+        questionHash,            // r2: question_hash (field.private)
+        `${initialYesPrice}u64`, // r3: initial_yes_price (u64.private)
+        `${minLiquidity}u64`,    // r4: min_liquidity (u64.private)
+        `${closingBlock}u32`,    // r5: closing_block (u32.private)
+        `${creationFee}u64`      // r6: creation_fee (u64.public)
       ];
 
-      console.log("🔧 Transaction inputs:", inputs);
-      console.log("🔧 Liquidity in microcredits:", liquidityInMicrocredits);
-      console.log("🔧 Available records count:", records.length);
+      console.log("🔧 Transaction inputs:", {
+        question,
+        questionTitleHash,
+        questionHash,
+        initialYesPrice,
+        minLiquidity,
+        closingBlock,
+        creationFee
+      });
 
-      // Use high fee as requested by user
-      const fee = 20_000_000; // 20 million microcredits = 20 ALEO
-
-      console.log("🔧 Creating transaction with fee:", fee);
+      console.log("🔧 Creating transaction...");
       const aleoTransaction = Transaction.createTransaction(
         publicKey,
         WalletAdapterNetwork.TestnetBeta,
-        'quoicoubeh_feur.aleo',
-        'create_market',
+        PREDICTION_MARKET_PROGRAM,
+        'create_market_with_auto_tokens',
         inputs,
-        fee,
+        creationFee,
         false
       );
 
@@ -183,7 +201,7 @@ export default function CreateMarket() {
         message: `Market "${formData.question}" creation submitted successfully! Transaction ID: ${transactionId.slice(0, 16)}...`
       });
 
-      // Optional: Check transaction status as shown in docs
+      // Optional: Check transaction status
       if (transactionStatus) {
         try {
           const status = await transactionStatus(transactionId);
@@ -412,10 +430,10 @@ export default function CreateMarket() {
                 <div>
                   <h4 className="font-medium text-gray-900 mb-2">Smart Contract Info</h4>
                   <ul className="text-sm text-gray-600 space-y-1">
-                    <li>• Program: quoicoubeh_feur.aleo</li>
-                    <li>• Function: create_market</li>
-                    <li>• Simple 3-parameter execution</li>
-                    <li>• Creates Market.record on-chain</li>
+                    <li>• Program: prediction_market_paris_v5.aleo</li>
+                    <li>• Function: create_market_with_auto_tokens</li>
+                    <li>• Creates Yes/No tokens automatically</li>
+                    <li>• Requires 3 ALEO creation fee</li>
                   </ul>
                 </div>
                 <div>

@@ -11,7 +11,7 @@ import {
 await initThreadPool();
 
 // Program name - simplified smart contract
-const PROGRAM_NAME = "quoicoubeh_feur.aleo";
+const PROGRAM_NAME = "prediction_market_paris_v5.aleo";
 
 // Testnet configuration - try different endpoints to avoid CORS
 const TESTNET_API_URL = "https://api.explorer.aleo.org/v1";
@@ -115,7 +115,7 @@ async function attemptExecution(marketData: {
     // Execute the transaction on the blockchain using proper SDK method
     const executionOptions = {
       programName: PROGRAM_NAME,
-      functionName: "create_market",
+      functionName: "create_market_with_auto_tokens",
       fee: 0.1, // Fee in ALEO credits
       privateFee: false,
       priorityFee: 0, // Priority fee
