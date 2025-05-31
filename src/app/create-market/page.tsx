@@ -6,10 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { DollarSign, Users } from "lucide-react";
+import { DollarSign, Users, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import { createMarket, validateMarketData, type CreateMarketData } from "@/lib/markets";
 
 const categories = [
   "US Politics", "Sports", "World Politics", "Russia/Ukraine", "Current Events", "Economics", "Science", "Technology", "Entertainment"
@@ -17,22 +17,83 @@ const categories = [
 
 export default function CreateMarket() {
   const { publicKey, connected } = useWallet();
-  const [formData, setFormData] = useState({
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: "" });
+  
+  const [formData, setFormData] = useState<CreateMarketData>({
     question: "",
-    category: "",
     resolutionDate: "",
     initialLiquidity: "",
-    tags: ""
   });
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleInputChange = (field: keyof CreateMarketData, value: string) => {
+    setFormData((prev: CreateMarketData) => ({ ...prev, [field]: value }));
+    // Clear status when user starts typing again
+    if (submitStatus.type) {
+      setSubmitStatus({ type: null, message: "" });
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // TODO: Implement market creation logic
-    console.log("Creating market with data:", formData);
+    
+    if (!connected || !publicKey) {
+      setSubmitStatus({
+        type: 'error',
+        message: "Please connect your wallet to create a market"
+      });
+      return;
+    }
+
+    // Validate form data
+    const validation = validateMarketData(formData);
+    if (!validation.valid) {
+      setSubmitStatus({
+        type: 'error',
+        message: validation.errors[0] // Show first error
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitStatus({ type: null, message: "" });
+
+    try {
+      const result = await createMarket(formData, publicKey);
+      
+      if (result.success && result.market) {
+        setSubmitStatus({
+          type: 'success',
+          message: `Market "${result.market.question}" created successfully!`
+        });
+        
+        // Reset form after successful creation
+        setTimeout(() => {
+          setFormData({
+            question: "",
+            resolutionDate: "",
+            initialLiquidity: "",
+          });
+          setSubmitStatus({ type: null, message: "" });
+        }, 3000);
+        
+      } else {
+        setSubmitStatus({
+          type: 'error',
+          message: result.error || "Failed to create market"
+        });
+      }
+    } catch (error) {
+      setSubmitStatus({
+        type: 'error',
+        message: "An unexpected error occurred"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -55,6 +116,24 @@ export default function CreateMarket() {
             <p className="text-lg text-gray-600">Ask a question about the future and let the market decide the outcome.</p>
           </div>
 
+          {/* Status Messages */}
+          {submitStatus.type && (
+            <div className={`mb-6 p-4 rounded-md border ${
+              submitStatus.type === 'success' 
+                ? 'bg-green-50 border-green-200 text-green-800' 
+                : 'bg-red-50 border-red-200 text-red-800'
+            }`}>
+              <div className="flex items-center gap-2">
+                {submitStatus.type === 'success' ? (
+                  <CheckCircle className="w-5 h-5" />
+                ) : (
+                  <AlertCircle className="w-5 h-5" />
+                )}
+                <span className="text-sm font-medium">{submitStatus.message}</span>
+              </div>
+            </div>
+          )}
+
           {/* Create Market Form */}
           <Card className="bg-white border rounded-none">
             <CardHeader>
@@ -74,73 +153,45 @@ export default function CreateMarket() {
                     value={formData.question}
                     onChange={(e) => handleInputChange("question", e.target.value)}
                     className="w-full"
+                    disabled={isSubmitting}
                   />
                   <p className="text-xs text-gray-500">Ask a clear, unambiguous question with a definitive outcome.</p>
                 </div>
 
-                {/* Category and Resolution Date */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="category" className="text-sm font-medium text-gray-700">Category *</Label>
-                    <select
-                      id="category"
-                      value={formData.category}
-                      onChange={(e) => handleInputChange("category", e.target.value)}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      <option value="">Select a category</option>
-                      {categories.map((cat) => (
-                        <option key={cat} value={cat.toLowerCase().replace(/\s+/g, '-')}>
-                          {cat}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="resolutionDate" className="text-sm font-medium text-gray-700">
-                      Resolution Date *
-                    </Label>
-                    <Input
-                      id="resolutionDate"
-                      type="date"
-                      value={formData.resolutionDate}
-                      onChange={(e) => handleInputChange("resolutionDate", e.target.value)}
-                      className="w-full"
-                    />
-                  </div>
+                {/* Resolution Date */}
+                <div className="space-y-2">
+                  <Label htmlFor="resolutionDate" className="text-sm font-medium text-gray-700">
+                    Resolution Date *
+                  </Label>
+                  <Input
+                    id="resolutionDate"
+                    type="date"
+                    value={formData.resolutionDate}
+                    onChange={(e) => handleInputChange("resolutionDate", e.target.value)}
+                    className="w-full"
+                    disabled={isSubmitting}
+                    min={new Date().toISOString().split('T')[0]} // Prevent past dates
+                  />
                 </div>
 
-                {/* Initial Liquidity and Tags */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="initialLiquidity" className="text-sm font-medium text-gray-700">
-                      Initial Liquidity (ALEO)
-                    </Label>
-                    <Input
-                      id="initialLiquidity"
-                      type="number"
-                      placeholder="100"
-                      value={formData.initialLiquidity}
-                      onChange={(e) => handleInputChange("initialLiquidity", e.target.value)}
-                      className="w-full"
-                    />
-                    <p className="text-xs text-gray-500">Minimum liquidity to bootstrap your market.</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="tags" className="text-sm font-medium text-gray-700">
-                      Tags
-                    </Label>
-                    <Input
-                      id="tags"
-                      placeholder="bitcoin, crypto, 2024"
-                      value={formData.tags}
-                      onChange={(e) => handleInputChange("tags", e.target.value)}
-                      className="w-full"
-                    />
-                    <p className="text-xs text-gray-500">Comma-separated tags to help users find your market.</p>
-                  </div>
+                {/* Initial Liquidity */}
+                <div className="space-y-2">
+                  <Label htmlFor="initialLiquidity" className="text-sm font-medium text-gray-700">
+                    Initial Liquidity (ALEO)
+                  </Label>
+                  <Input
+                    id="initialLiquidity"
+                    type="number"
+                    placeholder="100"
+                    value={formData.initialLiquidity}
+                    onChange={(e) => handleInputChange("initialLiquidity", e.target.value)}
+                    className="w-full"
+                    disabled={isSubmitting}
+                    min="0"
+                    step="0.01"
+                  />
+                  <p className="text-xs text-gray-500">Minimum liquidity to bootstrap your market.</p>
                 </div>
 
                 {/* Market Preview */}
@@ -164,13 +215,6 @@ export default function CreateMarket() {
                         <Badge className="bg-blue-100 text-blue-700 border-none px-2 py-1">Yes 50%</Badge>
                         <Badge className="bg-red-100 text-red-700 border-none px-2 py-1">No 50%</Badge>
                       </div>
-                      {formData.category && (
-                        <div className="mt-2">
-                          <Badge variant="outline" className="text-xs">
-                            {categories.find(cat => cat.toLowerCase().replace(/\s+/g, '-') === formData.category)}
-                          </Badge>
-                        </div>
-                      )}
                     </CardContent>
                   </Card>
                 </div>
@@ -186,16 +230,26 @@ export default function CreateMarket() {
                       <Button
                         type="submit"
                         className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3"
-                        disabled={!formData.question || !formData.category || !formData.resolutionDate}
+                        disabled={!formData.question || !formData.resolutionDate || isSubmitting}
                       >
-                        <DollarSign className="w-4 h-4 mr-2" />
-                        Create Market
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Creating Market...
+                          </>
+                        ) : (
+                          <>
+                            <DollarSign className="w-4 h-4 mr-2" />
+                            Create Market
+                          </>
+                        )}
                       </Button>
                       <Button
                         type="button"
                         variant="outline"
                         className="flex-1 py-3"
                         onClick={() => window.history.back()}
+                        disabled={isSubmitting}
                       >
                         Cancel
                       </Button>
