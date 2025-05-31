@@ -6,99 +6,13 @@ import { useWallet } from "@demox-labs/aleo-wallet-adapter-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-import Image from "next/image";
 import Navbar from "@/components/Navbar";
+import { cn } from "@/lib/utils";
+import { InteractiveGridPattern } from "@/components/magicui/interactive-grid-pattern";
+import { ScratchToReveal } from "@/components/magicui/scratch-to-reveal";
 
 const categories = [
   "All markets", "Featured", "US Politics", "Sports", "World Politics", "Russia/Ukraine", "Current Events", "Economics", "Science"
-];
-
-const featuredMarkets = [
-  {
-    avatar: "/elon.jpg",
-    question: "Will Elon Musk Father Another Child Before August 2023?",
-    resolution: "Aug 2, 2023",
-    volume: "$6,332",
-    yes: "36%",
-    no: "75%",
-  },
-  {
-    avatar: "/ayatollah.jpg",
-    question: "Will Ayatollah Khamenei Remain Supreme Leader of Iran?",
-    resolution: "Jan 1, 2023",
-    volume: "$3,420",
-    yes: "99.9%",
-    no: "4%",
-  },
-  {
-    avatar: "/sbf.jpg",
-    question: "Will Sam Bankman-Fried Go on the Run Before 2023?",
-    resolution: "Jan 1, 2023",
-    volume: "$3,203",
-    yes: "14%",
-    no: "99.9%",
-  },
-  {
-    avatar: "/biden.jpg",
-    question: "Will Joe Biden Remain President Through 2022?",
-    resolution: "Jan 2, 2023",
-    volume: "$4,721",
-    yes: "No",
-    no: "2%",
-  },
-  {
-    avatar: "/predictit.png",
-    question: "Will PredictIt Survive?",
-    resolution: "Feb 16, 2023",
-    volume: "$6,799",
-    yes: "11%",
-    no: "90%",
-  },
-  {
-    avatar: "/democrat.png",
-    question: "Who Will Win the 2024 Democratic Presidential Nomination?",
-    resolution: "Oct 1, 2024",
-    volume: "$8,438",
-    yes: "70%",
-    no: "-",
-  },
-];
-
-const popularMarkets = [
-  {
-    avatar: "/predictit.png",
-    question: "Will PredictIt Survive?",
-    resolution: "Feb 16, 2023",
-    volume: "$6,799",
-    yes: "11%",
-    no: "90%",
-  },
-  {
-    avatar: "/fauci.jpg",
-    question: "Will Anthony Fauci Remain NIAID Director Through the End of the Year?",
-    resolution: "Jan 2, 2023",
-    volume: "$3,203",
-    yes: "14%",
-    no: "99.9%",
-  },
-  {
-    avatar: "/trump.jpg",
-    question: "Will Donald Trump Become President by the End of 2022?",
-    resolution: "Jan 2, 2023",
-    volume: "$4,721",
-    yes: "No",
-    no: "2%",
-  },
-  {
-    avatar: "/gop.png",
-    question: "Who Will Win the 2024 Republican Presidential Nomination?",
-    resolution: "Oct 1, 2024",
-    volume: "$8,438",
-    yes: "70%",
-    no: "-",
-  },
 ];
 
 const list_open_markets_id = ['123field', '2206field'];
@@ -297,58 +211,35 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       {/* Main Navbar */}
       <Navbar />
-      {/* Secondary Navbar */}
-      <nav className="bg-white border-b">
-        <div className="container mx-auto flex items-center gap-4 h-12 px-4 overflow-x-auto">
-          {categories.map((cat) => (
-            <a key={cat} href="#" className="text-sm text-gray-700 hover:text-blue-600 whitespace-nowrap px-2 py-1">
-              {cat}
-            </a>
-          ))}
-        </div>
-      </nav>
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 py-10 flex flex-col md:flex-row items-center gap-8 relative">
-        <div className="flex-1 space-y-4">
-          <h1 className="text-4xl font-bold text-gray-900">Predict the Future</h1>
-          <p className="text-lg text-gray-600">Place your bets on real-world questions and see the market consensus.</p>
-          <div className="flex gap-4">
-            <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white">
-              <a href="/create-market">Create Market</a>
-            </Button>
-          </div>
-        </div>
-      </section>
 
       {/* Live Aleo Markets */}
       <section className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-900">Live Aleo Markets</h2>
-          <Button onClick={fetchAllMarkets} disabled={loading} className="bg-green-600 hover:bg-green-700 text-white">
-            {loading ? 'Loading...' : 'Refresh'}
-          </Button>
-        </div>
-        
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
             {error}
           </div>
         )}
-        
+
         {loading ? (
           <div className="text-center py-8">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             <p className="mt-2 text-gray-600">Loading market data...</p>
           </div>
         ) : aleoMarkets.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="relative flex w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-background grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <InteractiveGridPattern
+        className={cn(
+          "[mask-image:radial-gradient(400px_circle_at_center,white,transparent)]",
+          "inset-x-0 inset-y-[-30%] h-[200%]",
+        )}
+      ></InteractiveGridPattern>
             {aleoMarkets.map((market, i) => (
-              <Card key={i} className="bg-white border rounded-lg shadow-sm hover:shadow-md transition-shadow">
+              <Card key={i} className="bg-[#121212] rounded-lg shadow-sm hover:shadow-md transition-shadow z-20 border-none">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-blue-700">
+                  <CardTitle className="text-sm font-medium text-white">
                     Market ID: {market.id}
                   </CardTitle>
-                  <CardDescription className="text-xs text-gray-500">
+                  <CardDescription className="text-xs text-white">
                     Question ID: {market.question}
                   </CardDescription>
                 </CardHeader>
@@ -357,37 +248,37 @@ export default function Home() {
                     {/* Status and Basic Info */}
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div>
-                        <span className="text-gray-500">Status:</span>
+                        <span className="text-white">Status:</span>
                         <Badge className={`ml-1 ${market.status === '0u8' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                           {market.status === '0u8' ? 'Active' : 'Closed'}
                         </Badge>
                       </div>
                       <div>
-                        <span className="text-gray-500">Trades:</span>
+                        <span className="text-white">Trades:</span>
                         <span className="ml-1 font-medium">{safeReplace(market.trade_count, /u32$/, '')}</span>
                       </div>
                     </div>
                     
                     {/* Creator */}
                     <div className="text-xs">
-                      <span className="text-gray-500">Creator:</span>
-                      <div className="font-mono text-xs text-gray-700 truncate" title={market.creator}>
+                      <span className="text-white">Creator:</span>
+                      <div className="font-mono text-xs text-white truncate" title={market.creator}>
                         {market.creator ? `${market.creator.slice(0, 20)}...` : 'N/A'}
                       </div>
                     </div>
                     
                     {/* Prices Section - More Prominent */}
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <div className="text-xs font-semibold text-gray-700 mb-2">Current Prices</div>
+                    <div className="bg-[#121212] p-3 rounded-lg">
+                      <div className="text-xs font-semibold text-white mb-2">Current Prices</div>
                       <div className="grid grid-cols-2 gap-3">
                         <div className="text-center">
-                          <div className="text-xs text-gray-500 mb-1">yes.last_yes_price</div>
+                          <div className="text-xs text-white mb-1">yes.last_yes_price</div>
                           <div className="text-lg font-bold text-blue-600">
                             {market.last_yes_price}
                           </div>
                         </div>
                         <div className="text-center">
-                          <div className="text-xs text-gray-500 mb-1">no.last_no_price</div>
+                          <div className="text-xs text-white mb-1">no.last_no_price</div>
                           <div className="text-lg font-bold text-red-600">
                             {market.last_no_price}
                           </div>
@@ -396,19 +287,19 @@ export default function Home() {
                     </div>
                     
                     {/* Liquidity Info */}
-                    <div className="bg-blue-50 p-3 rounded-lg">
-                      <div className="text-xs font-semibold text-gray-700 mb-2">Liquidity Information</div>
+                    <div className="bg-[#121212] p-3 rounded-lg">
+                      <div className="text-xs font-semibold text-white mb-2">Liquidity Information</div>
                       <div className="space-y-1 text-xs">
                         <div className="flex justify-between">
-                          <span className="text-gray-500">Total Liquidity:</span>
-                          <span className="font-semibold text-gray-700">{formatLiquidity(market.total_liquidity)}</span>
+                          <span className="text-white">Total Liquidity:</span>
+                          <span className="font-semibold text-white">{formatLiquidity(market.total_liquidity)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-500">Yes Reserve:</span>
+                          <span className="text-white">Yes Reserve:</span>
                           <span className="font-medium text-blue-600">{formatLiquidity(market.yes_reserve)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-500">No Reserve:</span>
+                          <span className="text-white">No Reserve:</span>
                           <span className="font-medium text-red-600">{formatLiquidity(market.no_reserve)}</span>
                         </div>
                       </div>
@@ -416,17 +307,17 @@ export default function Home() {
                     
                     {/* Token IDs */}
                     <div className="text-xs">
-                      <div className="text-gray-500 mb-1">Token IDs:</div>
+                      <div className="text-white mb-1">Token IDs:</div>
                       <div className="space-y-1">
                         <div className="flex justify-between">
                           <span className="text-blue-600">Yes Token:</span>
-                          <span className="font-mono text-xs text-gray-600" title={market.yes_token_id}>
+                          <span className="font-mono text-xs text-white" title={market.yes_token_id}>
                             {market.yes_token_id ? `${market.yes_token_id.slice(0, 12)}...` : 'N/A'}
                           </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-red-600">No Token:</span>
-                          <span className="font-mono text-xs text-gray-600" title={market.no_token_id}>
+                          <span className="font-mono text-xs text-white" title={market.no_token_id}>
                             {market.no_token_id ? `${market.no_token_id.slice(0, 12)}...` : 'N/A'}
                           </span>
                         </div>
@@ -436,11 +327,11 @@ export default function Home() {
                     {/* Additional Info */}
                     <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t">
                       <div>
-                        <span className="text-gray-500">Closing Block:</span>
+                        <span className="text-white">Closing Block:</span>
                         <div className="font-medium">{safeReplace(market.closing_block, /u32$/, '')}</div>
                       </div>
                       <div>
-                        <span className="text-gray-500">Winning Option:</span>
+                        <span className="text-white">Winning Option:</span>
                         <div className="font-medium">
                           {market.winning_option === '0u8' ? 'TBD' : 
                            market.winning_option === '1u8' ? 'Yes' : 
@@ -469,73 +360,46 @@ export default function Home() {
           </div>
         )}
       </section>
-
-      {/* Featured Markets */}
-      <section className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-900">Featured Markets</h2>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500">Last price</span>
-            <input type="checkbox" className="accent-blue-600" />
-            <span className="text-xs text-gray-500">Best price</span>
-            <select className="ml-4 border rounded px-2 py-1 text-sm text-gray-700">
-              <option>All categories</option>
-            </select>
+      <section className="container mx-auto px-4 py-20">
+        <div className="flex flex-col items-center justify-center">
+          <div className="py-20">
+            <h2 className="text-5xl font-bold text-gray-900"></h2>
           </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {featuredMarkets.map((m, i) => (
-            <Card key={i} className="bg-white border rounded-none">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <a href={`/market/${i}`} className="text-sm font-medium text-blue-700 hover:underline line-clamp-2">{m.question}</a>
-                </div>
-                <div className="text-xs text-gray-500 mb-2">Resolution Date: {m.resolution}</div>
-                <div className="flex items-center justify-between text-xs mb-2">
-                  <span className="text-gray-500">Volume</span>
-                  <span className="font-semibold text-gray-700">{m.volume}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-blue-100 text-blue-700 border-none px-2 py-1">Yes {m.yes}</Badge>
-                  <Badge className="bg-red-100 text-red-700 border-none px-2 py-1">No {m.no}</Badge>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+          <div className="flex items-center justify-center gap-10">
+            <p className="text-3xl font-bold text-gray-900">Imagine a future where...<br/>privacy is the norm.</p>
+            <ScratchToReveal
+              width={250}
+              height={250}
+              minScratchPercentage={70}
+              className="flex items-center justify-center overflow-hidden rounded-2xl border-2 bg-gray-100"
+              gradientColors={["#121212", "#121212", "#121212"]}
+            >
+              <p className="text-9xl">🕵️</p>
+            </ScratchToReveal>
+          </div>
+        </div>    
       </section>
-      {/* Popular Markets */}
-      <section className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-900">Popular Markets</h2>
-          <div>
-            <select className="border rounded px-2 py-1 text-sm text-gray-700">
-              <option>Liquidity</option>
-            </select>
-            <select className="ml-2 border rounded px-2 py-1 text-sm text-gray-700">
-              <option>All categories</option>
-            </select>
+
+      <section className="bg-[#121212] mt-20">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col items-start justify-start">
+            <h2 className="text-5xl font-bold text-white">How it works</h2>
+            <div className="flex flex-col items-start justify-start gap-12 pt-12">
+              <div className="flex flex-col items-start justify-start">
+                <h3 className="text-2xl font-bold text-white">Create Markets</h3>
+                <p className="text-white">Create a market by asking a question and setting the closing block.</p>
+              </div>
+              <div className="flex flex-col items-start justify-start">
+                <h3 className="text-2xl font-bold text-white">Trade Positions</h3>
+                <p className="text-white">Buy and sell YES/NO positions. Prices move based on market sentiment and trading activity.</p>
+              </div>
+              
+              <div className="flex flex-col items-start justify-start">
+                <h3 className="text-2xl font-bold text-white">Earn Rewards</h3>
+                <p className="text-white">When markets resolve, correct predictions are rewarded. Liquidity providers earn fees.</p>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {popularMarkets.map((m, i) => (
-            <Card key={i} className="bg-white border rounded-none">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <a href={`/market/${i}`} className="text-sm font-medium text-blue-700 hover:underline line-clamp-2">{m.question}</a>
-                </div>
-                <div className="text-xs text-gray-500 mb-2">Resolution Date: {m.resolution}</div>
-                <div className="flex items-center justify-between text-xs mb-2">
-                  <span className="text-gray-500">Volume</span>
-                  <span className="font-semibold text-gray-700">{m.volume}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-blue-100 text-blue-700 border-none px-2 py-1">Yes {m.yes}</Badge>
-                  <Badge className="bg-red-100 text-red-700 border-none px-2 py-1">No {m.no}</Badge>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
         </div>
       </section>
     </div>

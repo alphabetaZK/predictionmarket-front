@@ -6,7 +6,7 @@ import { Search } from "lucide-react";
 import Link from "next/link";
 export default function Navbar() {
   return (
-    <nav className="bg-[#121212] text-white border-b">
+    <nav className="text-black border-b">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2 font-bold text-lg">
