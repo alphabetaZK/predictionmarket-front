@@ -134,6 +134,11 @@ export default function Home() {
         <div className="flex-1 space-y-4">
           <h1 className="text-4xl font-bold text-gray-900">Predict the Future</h1>
           <p className="text-lg text-gray-600">Place your bets on real-world questions and see the market consensus.</p>
+          <div className="flex gap-4">
+            <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white">
+              <a href="/create-market">Create Market</a>
+            </Button>
+          </div>
         </div>
       </section>
       {/* Featured Markets */}
