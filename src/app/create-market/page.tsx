@@ -128,26 +128,28 @@ export default function CreateMarket() {
       }
 
       // Create an encoder for the question
-      const ALPHABET = " abcdefghijklmnopqrstuvwxyz";
+      const ALPHABET = " abcdefghijklmnopqrstuvwxyzàâäéèêëîïôöùûüÿçñ-?0123456789$";
       const BASE = ALPHABET.length;
 
-      function encode(text: string): number {
-        let number = 0;
-        for (const char of text.toLowerCase()) {
-          const index = ALPHABET.indexOf(char);
-          if (index === -1) throw new Error(`Invalid character: ${char}`);
-          number = number * BASE + index;
+      function encode(text: string): string {
+        const cleaned = text.toLowerCase().replace(/[^a-zàâäéèêëîïôöùûüÿçñ \-\?0-9\$]/g, '').slice(0, 35);
+        let number = 0n;
+        for (const char of cleaned) {
+          const index = BigInt(ALPHABET.indexOf(char));
+          if (index === -1n) throw new Error(`Invalid character: ${char}`);
+          number = number * BigInt(BASE) + index;
         }
-        return number;
+        return number.toString();
       }
 
-      function decode(number: number): string {
-        if (number === 0) return ALPHABET[0];
+      function decode(numberStr: string): string {
+        let n = BigInt(numberStr);
+        if (n === 0n) return ALPHABET[0];
         let chars = [];
-        while (number > 0) {
-          const rem = number % BASE;
-          chars.push(ALPHABET[rem]);
-          number = Math.floor(number / BASE);
+        while (n > 0n) {
+          const rem = n % BigInt(BASE);
+          chars.push(ALPHABET[Number(rem)]);
+          n = n / BigInt(BASE);
         }
         return chars.reverse().join('');
       }
@@ -164,9 +166,10 @@ export default function CreateMarket() {
       }
 
       // Convert all string inputs to field type
-      const questionHash = `${encode(formData.question)}field`;
-      const questionTitleHash = `${encode(formData.question)}field`;
-      const question = `${encode(formData.question)}field`;
+      const encoded = encode(formData.question);
+      const questionHash = `${encoded}field`;
+      const questionTitleHash = `${encoded}field`;
+      const question = `${encoded}field`;
       
       // Log the market ID (using questionHash as it's unique for each market)
       console.log("📊 Market ID:", question);

@@ -23,7 +23,7 @@ const categories = [
   "All markets", "Featured", "US Politics", "Sports", "World Politics", "Russia/Ukraine", "Current Events", "Economics", "Science"
 ];
 
-const list_open_markets_id = ['2927529426311100field', '73418128980065620field', '73418128980065620field', '73418128980065620field', '73418128980065620field', '73418128980065620field'];
+const list_open_markets_id = ['162320633731247959020298612507628field' ,'1099044356953696120641703888016647194691452320851068399field', '32045428754695234026485100701788097287434148field', '287585669545040273163442407756field'];
 
 interface MarketData {
   id: string;
@@ -235,7 +235,7 @@ export default function Home() {
             <p className="mt-2 text-gray-600">Loading market data...</p>
           </div>
         ) : aleoMarkets.length > 0 ? (
-          <div className="relative flex w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-background grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+          <div className="relative flex w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-background grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
             <InteractiveGridPattern
         className={cn(
           "[mask-image:radial-gradient(400px_circle_at_center,white,transparent)]",
@@ -246,15 +246,13 @@ export default function Home() {
               <Link 
                 href={`/market/${market.id}`} 
                 key={i}
-                className="block transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                className="block z-20 transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
               >
-                <div className="relative">
                   <MarketQuestionCard
                     question={market.question}
                     yesPercent={parseFloat(market.last_yes_price.replace(/u64$/, ''))}
                     noPercent={parseFloat(market.last_no_price.replace(/u64$/, ''))}
                   />
-                </div>
               </Link>
             ))}
           </div>

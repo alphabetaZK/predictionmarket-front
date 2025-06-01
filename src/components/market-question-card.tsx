@@ -6,7 +6,7 @@ interface MarketQuestionCardProps {
   noPercent: number;
 }
 
-const ALPHABET = " abcdefghijklmnopqrstuvwxyzàâäéèêëîïôöùûüÿçñ-?";
+const ALPHABET = " abcdefghijklmnopqrstuvwxyzàâäéèêëîïôöùûüÿçñ-?0123456789$";
 const BASE = ALPHABET.length;
 
 export function decodeQuestion(question: string): string {

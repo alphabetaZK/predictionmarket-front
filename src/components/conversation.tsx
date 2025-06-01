@@ -40,10 +40,10 @@ export const Conversation = forwardRef((props, ref) => {
                     console.warn("No credit records found, but attempting transaction anyway.");
                   }
                   // Encoder
-                  const ALPHABET = " abcdefghijklmnopqrstuvwxyzàâäéèêëîïôöùûüÿçñ-?";
+                  const ALPHABET = " abcdefghijklmnopqrstuvwxyzàâäéèêëîïôöùûüÿçñ-?0123456789$";
                   const BASE = ALPHABET.length;
                   function encode(text: string) {
-                    const cleaned = text.toLowerCase().replace(/[^a-zàâäéèêëîïôöùûüÿçñ \-\?]/g, '').slice(0, 35);
+                    const cleaned = text.toLowerCase().replace(/[^a-zàâäéèêëîïôöùûüÿçñ \-\?0-9\$]/g, '').slice(0, 35);
                     let number = 0n;
                     for (const char of cleaned) {
                       const index = BigInt(ALPHABET.indexOf(char));
