@@ -204,34 +204,12 @@ export default function MarketDetailPage() {
           const totalLiquidity = parseInt(marketData.total_liquidity.replace(/u64$/, ''));
 
           console.log('Parsed values:', {
-            yesPrice: yesPrice / 1_000_000, // Convert to ALEO
-            noPrice: noPrice / 1_000_000,   // Convert to ALEO
-            yesReserve: yesReserve / 1_000_000, // Convert to ALEO
-            noReserve: noReserve / 1_000_000,   // Convert to ALEO
-            totalLiquidity: totalLiquidity / 1_000_000 // Convert to ALEO
+            yesPrice,
+            noPrice,
+            yesReserve: yesReserve / 1_000_000,
+            noReserve: noReserve / 1_000_000,
+            totalLiquidity: totalLiquidity / 1_000_000
           });
-
-          // Vérifier que les prix sont cohérents (ils devraient représenter des pourcentages)
-          const totalPrice = (yesPrice + noPrice) / 1_000_000;
-          if (Math.abs(totalPrice - 100) > 0.01) { // Allow for small floating point differences
-            console.warn('Prices do not sum to 100%:', { 
-              yesPrice: yesPrice / 1_000_000, 
-              noPrice: noPrice / 1_000_000,
-              total: totalPrice
-            });
-          }
-
-          // Vérifier que les réserves sont cohérentes
-          const totalReserves = (yesReserve + noReserve) / 1_000_000;
-          const totalLiquidityAleo = totalLiquidity / 1_000_000;
-          if (Math.abs(totalReserves - totalLiquidityAleo) > 0.01) { // Allow for small floating point differences
-            console.warn('Reserves do not match total liquidity:', { 
-              yesReserve: yesReserve / 1_000_000, 
-              noReserve: noReserve / 1_000_000,
-              totalReserves,
-              totalLiquidity: totalLiquidityAleo
-            });
-          }
 
           setMarket(marketData);
         } else {
@@ -251,30 +229,15 @@ export default function MarketDetailPage() {
   const formatPrice = (price: string) => {
     if (!price) return "0.00%";
     const numPrice = parseInt(price.replace(/u64$/, ''));
-    console.log('Raw price value:', price, 'Parsed:', numPrice);
-    
-    // Les prix sont stockés en microcredits (1 ALEO = 1_000_000 microcredits)
-    // Nous devons les convertir en pourcentage
-    const normalizedPrice = (numPrice / 1_000_000).toFixed(2);
-    console.log('Normalized price:', normalizedPrice + '%');
-    return `${normalizedPrice}%`;
+    // Utiliser la même logique que la page d'accueil
+    return `${numPrice.toFixed(2)}%`;
   };
 
   const formatLiquidity = (liquidity: string) => {
-    if (!liquidity) return "0.00 ALEO";
+    if (!liquidity) return "$0.00";
     const numLiquidity = parseInt(liquidity.replace(/u64$/, ''));
-    console.log('Raw liquidity value:', liquidity, 'Parsed:', numLiquidity);
-    
-    // Vérifier que la liquidité est valide
-    if (isNaN(numLiquidity) || numLiquidity < 0) {
-      console.warn('Invalid liquidity value:', liquidity);
-      return "0.00 ALEO";
-    }
-    
-    // Les réserves sont déjà en microcredits, donc on divise par 1_000_000 pour avoir des ALEO
-    const aleoAmount = (numLiquidity / 1_000_000).toFixed(2);
-    console.log('Converted to ALEO:', aleoAmount);
-    return `${aleoAmount} ALEO`;
+    // Utiliser la même logique que la page d'accueil
+    return `$${(numLiquidity / 1000000).toFixed(2)}`;
   };
 
   return (

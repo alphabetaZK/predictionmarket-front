@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { InteractiveGridPattern } from "@/components/magicui/interactive-grid-pattern";
 import { ScratchToReveal } from "@/components/magicui/scratch-to-reveal";
 import { MarketQuestionCard } from "@/components/market-question-card";
+import Link from "next/link";
 
 const categories = [
   "All markets", "Featured", "US Politics", "Sports", "World Politics", "Russia/Ukraine", "Current Events", "Economics", "Science"
@@ -235,12 +236,19 @@ export default function Home() {
         )}
       ></InteractiveGridPattern>
             {aleoMarkets.map((market, i) => (
-              <MarketQuestionCard
+              <Link 
+                href={`/market/${market.id}`} 
                 key={i}
-                question={market.question}
-                yesPercent={parseFloat(market.last_yes_price.replace(/u64$/, ''))}
-                noPercent={parseFloat(market.last_no_price.replace(/u64$/, ''))}
-              />
+                className="block transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+              >
+                <div className="relative">
+                  <MarketQuestionCard
+                    question={market.question}
+                    yesPercent={parseFloat(market.last_yes_price.replace(/u64$/, ''))}
+                    noPercent={parseFloat(market.last_no_price.replace(/u64$/, ''))}
+                  />
+                </div>
+              </Link>
             ))}
           </div>
         ) : (
