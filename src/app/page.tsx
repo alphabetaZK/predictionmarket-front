@@ -12,6 +12,12 @@ import { InteractiveGridPattern } from "@/components/magicui/interactive-grid-pa
 import { ScratchToReveal } from "@/components/magicui/scratch-to-reveal";
 import { MarketQuestionCard } from "@/components/market-question-card";
 import Link from "next/link";
+import { Conversation } from '@/components/conversation';
+
+type ConversationHandle = {
+  startConversation: () => void;
+  stopConversation: () => void;
+};
 
 const categories = [
   "All markets", "Featured", "US Politics", "Sports", "World Politics", "Russia/Ukraine", "Current Events", "Economics", "Science"
@@ -42,6 +48,7 @@ export default function Home() {
   const [aleoMarkets, setAleoMarkets] = useState<MarketData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const conversationRef = useRef<ConversationHandle>(null);
 
   const fetchMarketData = async (marketId: string): Promise<MarketData | null> => {
     try {
@@ -257,6 +264,9 @@ export default function Home() {
           </div>
         )}
       </section>
+
+      <Conversation ref={conversationRef} />
+
       <section className="container mx-auto px-4 py-20">
         <div className="flex flex-col items-center justify-center">
           <div className="py-20">
@@ -270,6 +280,7 @@ export default function Home() {
               minScratchPercentage={70}
               className="flex items-center justify-center overflow-hidden rounded-2xl border-2 bg-gray-100"
               gradientColors={["#111827", "#1f2937", "#111827"]}
+              onComplete={() => conversationRef.current?.startConversation()}
             >
               <p className="text-9xl">🕵️</p>
             </ScratchToReveal>

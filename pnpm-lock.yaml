@@ -14,6 +14,9 @@ dependencies:
   '@demox-labs/aleo-wallet-adapter-reactui':
     specifier: ^0.0.36
     version: 0.0.36(react-dom@19.1.0)(react@19.1.0)
+  '@elevenlabs/react':
+    specifier: ^0.1.6
+    version: 0.1.6(react@19.1.0)
   '@provablehq/sdk':
     specifier: ^0.8.8
     version: 0.8.8
@@ -156,6 +159,19 @@ packages:
       '@demox-labs/aleo-wallet-adapter-react': 0.0.22(react@19.1.0)
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
+    dev: false
+
+  /@elevenlabs/client@0.1.6:
+    resolution: {integrity: sha512-lpROzC4m13OfhMdGbV+zpyETWn1NFsj9lXWexZHp5nPNv80/CtmtxLpGPGqMlko73GNlAt3EgmoFPxUKcGVH1A==}
+    dev: false
+
+  /@elevenlabs/react@0.1.6(react@19.1.0):
+    resolution: {integrity: sha512-7T7JK4i34T2yKNCrK6dlgv+w7w866dbhJlAN6YCPzqZvbpJnAOJ/eQv/vdIGgiXJ+vc49YFrKSanqiLtiJURfA==}
+    peerDependencies:
+      react: '>=16.8.0'
+    dependencies:
+      '@elevenlabs/client': 0.1.6
+      react: 19.1.0
     dev: false
 
   /@emnapi/runtime@1.4.3:

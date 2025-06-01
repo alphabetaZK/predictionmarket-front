@@ -12,6 +12,7 @@
     "@demox-labs/aleo-wallet-adapter-base": "^0.0.23",
     "@demox-labs/aleo-wallet-adapter-react": "^0.0.22",
     "@demox-labs/aleo-wallet-adapter-reactui": "^0.0.36",
+    "@elevenlabs/react": "^0.1.6",
     "@provablehq/sdk": "^0.8.8",
     "@radix-ui/react-navigation-menu": "^1.2.13",
     "@radix-ui/react-slot": "^1.2.3",

@@ -18,15 +18,10 @@ export default function Navbar() {
           <div className="hidden md:flex gap-6 text-sm font-medium">
             <Link href="/my-bets" className="hover:text-blue-400">My Bets</Link>
             <Link href="/create-market" className="hover:text-blue-400">Create Market</Link>
-            <a href="#" className="hover:text-blue-400">FAQ</a>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="relative hidden md:block">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
-            <Input placeholder="Search" className="pl-8 w-[200px] bg-[#1a2233] text-white border-none" />
-          </div>
-          <WalletMultiButton className="hover:bg-white" />
+        <div className="flex items-center gap-4 bg-gray-900 rounded-lg">
+          <WalletMultiButton className="bg-gray-900 text-white" />
         </div>
       </div>
     </nav>
