@@ -1,25 +1,25 @@
 
-# 🖥️ zkPredict Front – Interface Web3 pour le Prediction Market Anonyme
+# 🖥️ zkPredict Front – Web3 Interface for the Anonymous Prediction Market
 
-**Front-end application for interacting with the zkPredict protocol on Aleo.**
+**Front-end application to interact with the zkPredict protocol on Aleo.**
 
-Ce dépôt contient l'interface utilisateur du projet **zkPredict**, un marché de prédiction anonyme basé sur les ZK-proofs construit avec Leo sur la blockchain Aleo. Cette application permet aux utilisateurs de créer, parier et consulter les marchés de prédiction en toute confidentialité.
+This repository contains the user interface for **zkPredict**, a zero-knowledge-based anonymous prediction market built on the Aleo blockchain using Leo smart contracts. This dApp allows users to create markets, place bets, and view predictions—all while preserving their privacy.
 
-## ⚙️ Stack Technique
+## ⚙️ Tech Stack
 
 - ⚛️ React.js
 - 🦺 TypeScript
 - 🔐 Aleo Wallet SDK
-- ♻️ Zustand / Redux (état global)
-- 🌐 API SnarkOS (query + broadcast)
+- ♻️ Zustand / Redux (state management)
+- 🌐 SnarkOS API (query + broadcast)
 - 🎨 TailwindCSS
 
-## 🚀 Lancer le projet en local
+## 🚀 Getting Started
 
-### Prérequis
+### Prerequisites
 
 - Node.js >= 18
-- npm ou yarn
+- npm or yarn
 
 ### Installation
 
@@ -27,64 +27,65 @@ Ce dépôt contient l'interface utilisateur du projet **zkPredict**, un marché 
 npm install
 ```
 
-### Lancement
+### Running Locally
 
 ```bash
 npm run dev
 ```
 
-## 🔑 Fonctionnalités Clés
+## 🔑 Key Features
 
-- Connexion avec **Aleo Wallet**
-- Interface pour créer un marché avec une question
-- Intégration des tokens YES/NO mintés depuis le smart contract
-- Interface de pari privé
-- Visualisation de la liste des marchés actifs/clos
-- Affichage simplifié pour l’utilisateur : question, deadline, pool, statut
+- Aleo Wallet connection
+- Market creation with a custom question
+- Dynamic YES/NO token integration from Leo contract
+- Anonymous betting interface
+- View of open and closed markets
+- Simplified UI: question, deadline, token pools, status
 
-## 📦 Structure du Projet
+## 📦 Project Structure
 
 ```
 predictionmarket-front/
-├── public/               # Assets publics
+├── public/               # Public assets
 ├── src/
-│   ├── components/       # Composants réutilisables
-│   ├── pages/            # Pages principales (Home, Market, etc.)
-│   ├── services/         # Interactions avec Aleo API & Smart Contracts
-│   ├── utils/            # Fonctions utilitaires
-│   └── styles/           # Styles globaux
-├── .env                 # Variables d’environnement
-└── README.md            # Ce fichier
+│   ├── components/       # Reusable UI components
+│   ├── pages/            # Main pages (Home, Market, etc.)
+│   ├── services/         # API & smart contract interactions
+│   ├── utils/            # Utility functions
+│   └── styles/           # Global styles
+├── .env                  # Environment variables
+└── README.md             # This file
 ```
 
-## 🧪 Test
+## 🧪 Testing
 
-Des tests unitaires peuvent être ajoutés avec Jest / Vitest selon la configuration.
+Unit tests can be added using Jest or Vitest, depending on project setup.
 
-## 🤝 Contribution
+## 🤝 Contributing
 
-1. Fork le repo  
-2. Crée ta branche `git checkout -b feature/awesome-feature`  
-3. Commit `git commit -am 'Add new feature'`  
-4. Push `git push origin feature/awesome-feature`  
-5. Ouvre une **Pull Request**
+1. Fork this repository  
+2. Create a new branch `git checkout -b feature/your-feature`  
+3. Commit your changes `git commit -am 'Add feature'`  
+4. Push to your fork `git push origin feature/your-feature`  
+5. Submit a **Pull Request**
 
-## 🧠 Projet relié
+## 🧠 Related Project
 
-👉 [Smart Contracts Leo (prediction_market_leo)](https://github.com/alphabetaZK/prediction_market_leo)
+👉 [Smart Contracts in Leo (prediction_market_leo)](https://github.com/alphabetaZK/prediction_market_leo)
 
-## 👨‍💻 Équipe
+## 👨‍💻 Team
 
-- **Ramzy** – Lead Front Dev  
+- **Ramzy** – Lead Frontend Developer  
 - **Lina** – UI/UX Designer  
-- **Mathieu** – Intégration Wallet / ZK Logic  
+- **Mathieu** – Wallet integration & ZK logic  
 - **Salim** – Smart contract liaison  
-- **Abdellahi** – Tests & Feedback
+- **Abdellahi** – Testing & game theory
 
 ## 📩 Contact / Support
 
-- Via [GitHub Issues](https://github.com/alphabetaZK/predictionmarket-front/issues)
+- Open an issue at [GitHub Issues](https://github.com/alphabetaZK/predictionmarket-front/issues)
 
-## 🌐 Licence
+## 🌐 License
 
-MIT – Open-source, forkable, build your own private market.
+MIT – Open-source and free to build your own private market.
+
