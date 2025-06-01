@@ -5,18 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import { useState, useEffect } from "react";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  CartesianGrid,
-  ResponsiveContainer,
-} from "recharts";
 import { MarketQuestionCard, decodeQuestion } from "@/components/market-question-card";
 
 interface MarketData {
@@ -35,17 +23,6 @@ interface MarketData {
   last_no_price: string;
   trade_count: string;
 }
-
-const chartConfig = {
-  yes: {
-    label: "Yes",
-    color: "#22c55e", // green-500
-  },
-  no: {
-    label: "No",
-    color: "#ef4444", // red-500
-  },
-};
 
 export default function MarketDetailPage() {
   const params = useParams();
@@ -241,9 +218,9 @@ export default function MarketDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <div className="container mx-auto px-4 py-10">
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
         {loading ? (
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -254,123 +231,161 @@ export default function MarketDetailPage() {
             {error || 'Market not found'}
           </div>
         ) : (
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Left: Market Info & Chart */}
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-4">
+          <div className="space-y-6">
+            {/* Header Section */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex items-center gap-2 mb-3">
                 <Badge className="bg-blue-100 text-blue-700 border-none px-2 py-1">Prediction Market</Badge>
                 <Badge className="bg-green-100 text-green-700 border-none px-2 py-1">ALEO Market</Badge>
+                <Badge className="bg-gray-100 text-gray-700 border-none px-2 py-1">
+                  {market.status === '0u8' ? 'Active' : 'Resolved'}
+                </Badge>
               </div>
               
-              {/* Titre du marché avec la question décodée */}
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-snug">
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-snug break-words">
                 {decodeQuestion(market.question)}
               </h1>
 
-              {/* Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
-                <div className="bg-white rounded border p-3 text-center">
-                  <div className="text-xs text-gray-500 mb-1">Total Volume</div>
-                  <div className="font-semibold text-lg">{formatLiquidity(market.total_liquidity)}</div>
-                </div>
-                <div className="bg-white rounded border p-3 text-center">
-                  <div className="text-xs text-gray-500 mb-1">Yes Reserve</div>
-                  <div className="font-semibold text-lg">{formatLiquidity(market.yes_reserve)}</div>
-                </div>
-                <div className="bg-white rounded border p-3 text-center">
-                  <div className="text-xs text-gray-500 mb-1">No Reserve</div>
-                  <div className="font-semibold text-lg">{formatLiquidity(market.no_reserve)}</div>
-                </div>
-                <div className="bg-white rounded border p-3 text-center">
-                  <div className="text-xs text-gray-500 mb-1">Trade Count</div>
-                  <div className="font-semibold text-lg">{market.trade_count.replace('u32', '')}</div>
-                </div>
-              </div>
-              {/* Chart */}
-              <div className="bg-white border rounded p-4 mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex gap-2 text-xs text-gray-500">
-                    <button className="px-2 py-1 rounded bg-gray-100 text-blue-600 font-semibold">24hrs</button>
-                    <button className="px-2 py-1 rounded hover:bg-gray-100">7d</button>
-                    <button className="px-2 py-1 rounded hover:bg-gray-100">30d</button>
-                    <button className="px-2 py-1 rounded hover:bg-gray-100">All Time</button>
+              <div className="flex flex-wrap gap-4 items-center">
+                <div className="flex gap-4 items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span className="text-green-600 font-semibold">Yes {formatPrice(market.last_yes_price)}</span>
                   </div>
-                  <div className="text-xs text-gray-500">Time Range</div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                    <span className="text-red-600 font-semibold">No {formatPrice(market.last_no_price)}</span>
+                  </div>
                 </div>
-                <ChartContainer config={chartConfig} className="min-h-[180px] w-full">
-                  <ResponsiveContainer width="100%" height={180}>
-                    <LineChart data={[
-                      { date: "Now", yes: parseInt(market.last_yes_price.replace('u64', '')), no: parseInt(market.last_no_price.replace('u64', '')) }
-                    ]} margin={{ left: 0, right: 0, top: 10, bottom: 0 }}>
-                      <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                      <XAxis dataKey="date" tickLine={false} tickMargin={10} axisLine={false} />
-                      <Line type="monotone" dataKey="yes" stroke="#22c55e" strokeWidth={2} dot={false} />
-                      <Line type="monotone" dataKey="no" stroke="#ef4444" strokeWidth={2} dot={false} />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-                <div className="flex items-center justify-between mt-2 text-xs">
-                  <div className="flex gap-2 items-center">
-                    <span className="flex items-center gap-1 text-green-600">
-                      <span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
-                      Yes {formatPrice(market.last_yes_price)}
-                    </span>
-                    <span className="flex items-center gap-1 text-red-600">
-                      <span className="w-2 h-2 rounded-full bg-red-500 inline-block"></span>
-                      No {formatPrice(market.last_no_price)}
-                    </span>
-                  </div>
-                  <div className="flex gap-4">
-                    <span>Trade Count {market.trade_count.replace('u32', '')}</span>
-                    <span>Market ID {market.id}</span>
-                  </div>
+                <div className="text-sm text-gray-500">
+                  Trade Count: {market.trade_count.replace('u32', '')}
                 </div>
               </div>
             </div>
-            {/* Right: Buy/Sell Panel */}
-            <div className="w-full lg:w-[350px] flex-shrink-0">
-              <div className="bg-white border rounded-lg p-4 mb-4">
-                <div className="flex gap-2 mb-4">
-                  <button onClick={() => setTab("buy")}
-                    className={`flex-1 py-2 rounded font-semibold ${tab === "buy" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700"}`}>Buy</button>
-                  <button onClick={() => setTab("sell")}
-                    className={`flex-1 py-2 rounded font-semibold ${tab === "sell" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700"}`}>Sell</button>
-                </div>
-                <div className="flex items-center justify-between mb-2 text-sm">
-                  <span className="text-green-700">Yes <span className="font-semibold">{formatPrice(market.last_yes_price)}</span></span>
-                  <span className="text-red-700">No <span className="font-semibold">{formatPrice(market.last_no_price)}</span></span>
-                </div>
-                <div className="mb-2">
-                  <div className="flex items-center justify-between text-xs mb-1">
-                    <span>Amount</span>
-                    <span className="text-gray-500">Balance: 0.00 ALEO</span>
+
+            {/* Main Content */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left: Market Stats */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-white rounded-lg shadow-sm p-4">
+                    <div className="text-sm text-gray-500 mb-1">Total Volume</div>
+                    <div className="font-semibold text-lg truncate" title={formatLiquidity(market.total_liquidity)}>
+                      {formatLiquidity(market.total_liquidity)}
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <input type="number" min={0} value={amount} onChange={e => setAmount(Number(e.target.value))}
-                      className="flex-1 border rounded px-2 py-1 text-sm" placeholder="0.00" />
-                    <button className="bg-gray-100 px-2 rounded text-xs font-semibold">Max</button>
+                  <div className="bg-white rounded-lg shadow-sm p-4">
+                    <div className="text-sm text-gray-500 mb-1">Yes Reserve</div>
+                    <div className="font-semibold text-lg truncate" title={formatLiquidity(market.yes_reserve)}>
+                      {formatLiquidity(market.yes_reserve)}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1 mt-1 text-xs text-gray-500">
-                    <span>ALEO</span>
-                    <span>Rate: 1 ALEO = 1 Share</span>
+                  <div className="bg-white rounded-lg shadow-sm p-4">
+                    <div className="text-sm text-gray-500 mb-1">No Reserve</div>
+                    <div className="font-semibold text-lg truncate" title={formatLiquidity(market.no_reserve)}>
+                      {formatLiquidity(market.no_reserve)}
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-lg shadow-sm p-4">
+                    <div className="text-sm text-gray-500 mb-1">Closing Block</div>
+                    <div className="font-semibold text-lg">
+                      {market.closing_block.replace('u32', '')}
+                    </div>
                   </div>
                 </div>
-                <div className="space-y-1 text-xs text-gray-500 mb-2">
-                  <div className="flex justify-between"><span>Average Price</span><span>{formatPrice(market.last_yes_price)}</span></div>
-                  <div className="flex justify-between"><span>Estimated Shares</span><span>{amount.toFixed(2)}</span></div>
-                  <div className="flex justify-between"><span>Estimated Fees</span><span>0.001 ALEO</span></div>
+
+                {/* Market Info */}
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                  <h2 className="text-lg font-semibold mb-4">Market Information</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <div className="text-gray-500 mb-1">Creator</div>
+                      <div className="truncate font-medium" title={market.creator}>{market.creator}</div>
+                    </div>
+                    <div>
+                      <div className="text-gray-500 mb-1">Yes Token ID</div>
+                      <div className="truncate font-medium" title={market.yes_token_id}>{market.yes_token_id}</div>
+                    </div>
+                    <div>
+                      <div className="text-gray-500 mb-1">No Token ID</div>
+                      <div className="truncate font-medium" title={market.no_token_id}>{market.no_token_id}</div>
+                    </div>
+                    <div>
+                      <div className="text-gray-500 mb-1">Market ID</div>
+                      <div className="truncate font-medium" title={market.id}>{market.id}</div>
+                    </div>
+                  </div>
                 </div>
-                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-semibold">{tab === "buy" ? "Buy" : "Sell"}</button>
               </div>
-              <div className="bg-white border rounded-lg p-4 mb-4">
-                <div className="font-semibold mb-2 text-sm">Market Info</div>
-                <div className="text-xs text-gray-500 space-y-1">
-                  <p>Creator: {market.creator}</p>
-                  <p>Status: {market.status === '0u8' ? 'Active' : 'Resolved'}</p>
-                  <p>Closing Block: {market.closing_block.replace('u32', '')}</p>
-                  <p>Yes Token ID: {market.yes_token_id}</p>
-                  <p>No Token ID: {market.no_token_id}</p>
+
+              {/* Right: Trading Panel */}
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-lg shadow-sm p-6 sticky top-6">
+                  <div className="flex gap-2 mb-6">
+                    <button onClick={() => setTab("buy")}
+                      className={`flex-1 py-2.5 rounded-lg font-semibold transition-colors ${
+                        tab === "buy" 
+                          ? "bg-blue-600 text-white" 
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}>
+                      Buy
+                    </button>
+                    <button onClick={() => setTab("sell")}
+                      className={`flex-1 py-2.5 rounded-lg font-semibold transition-colors ${
+                        tab === "sell" 
+                          ? "bg-blue-600 text-white" 
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}>
+                      Sell
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between mb-6 text-sm">
+                    <span className="text-green-700">Yes <span className="font-semibold">{formatPrice(market.last_yes_price)}</span></span>
+                    <span className="text-red-700">No <span className="font-semibold">{formatPrice(market.last_no_price)}</span></span>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex items-center justify-between text-sm mb-2">
+                        <span className="text-gray-600">Amount</span>
+                        <span className="text-gray-500">Balance: 0.00 ALEO</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <input 
+                          type="number" 
+                          min={0} 
+                          value={amount} 
+                          onChange={e => setAmount(Number(e.target.value))}
+                          className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                          placeholder="0.00" 
+                        />
+                        <button className="bg-gray-100 px-3 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                          Max
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 text-sm text-gray-500">
+                      <div className="flex justify-between">
+                        <span>Average Price</span>
+                        <span className="font-medium">{formatPrice(market.last_yes_price)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Estimated Shares</span>
+                        <span className="font-medium">{amount.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Estimated Fees</span>
+                        <span className="font-medium">0.001 ALEO</span>
+                      </div>
+                    </div>
+
+                    <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-semibold transition-colors">
+                      {tab === "buy" ? "Buy" : "Sell"}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
