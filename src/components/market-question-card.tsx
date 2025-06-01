@@ -9,30 +9,35 @@ interface MarketQuestionCardProps {
 const ALPHABET = " abcdefghijklmnopqrstuvwxyz";
 const BASE = ALPHABET.length;
 
-function decode(number: number): string {
-  if (number === 0) return ALPHABET[0];
-  let chars = [];
-  while (number > 0) {
-    const rem = number % BASE;
-    chars.push(ALPHABET[rem]);
-    number = Math.floor(number / BASE);
+export function decodeQuestion(question: string): string {
+  try {
+    let questionToDecode = question;
+    if (question.endsWith('field')) {
+      questionToDecode = question.slice(0, -5);
+    }
+    if (typeof questionToDecode === 'number' || /^(\d+)$/.test(questionToDecode)) {
+      const number = parseInt(questionToDecode);
+      if (number === 0) return ALPHABET[0];
+      
+      let chars = [];
+      let n = number;
+      while (n > 0) {
+        const rem = n % BASE;
+        chars.push(ALPHABET[rem]);
+        n = Math.floor(n / BASE);
+      }
+      return chars.reverse().join('');
+    }
+    return question;
+  } catch (e) {
+    console.warn('Error decoding question:', e);
+    return question;
   }
-  return chars.reverse().join('');
 }
 
 export const MarketQuestionCard: React.FC<MarketQuestionCardProps> = ({ question, yesPercent, noPercent }) => {
-  let displayQuestion = question;
-  let questionToDecode = question;
-  if (typeof question === 'string' && question.endsWith('field')) {
-    questionToDecode = question.slice(0, -5);
-  }
-  if (typeof questionToDecode === 'number' || (typeof questionToDecode === 'string' && /^(\d+)$/.test(questionToDecode))) {
-    try {
-      displayQuestion = decode(Number(questionToDecode));
-    } catch (e) {
-      displayQuestion = question;
-    }
-  }
+  const displayQuestion = decodeQuestion(question);
+  
   return (
     <div className="z-20 my-0 bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 text-white overflow-hidden w-fit rounded-lg">
       <div className="w-fit ml-0 p-6">
