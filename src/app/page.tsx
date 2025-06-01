@@ -10,12 +10,13 @@ import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
 import { InteractiveGridPattern } from "@/components/magicui/interactive-grid-pattern";
 import { ScratchToReveal } from "@/components/magicui/scratch-to-reveal";
+import { MarketQuestionCard } from "@/components/market-question-card";
 
 const categories = [
   "All markets", "Featured", "US Politics", "Sports", "World Politics", "Russia/Ukraine", "Current Events", "Economics", "Science"
 ];
 
-const list_open_markets_id = ['123field', '2206field'];
+const list_open_markets_id = ['73418128980065620field', '73418128980065620field', '73418128980065620field', '73418128980065620field', '73418128980065620field', '73418128980065620field'];
 
 interface MarketData {
   id: string;
@@ -226,7 +227,7 @@ export default function Home() {
             <p className="mt-2 text-gray-600">Loading market data...</p>
           </div>
         ) : aleoMarkets.length > 0 ? (
-          <div className="relative flex w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-background grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="relative flex w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-background grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
             <InteractiveGridPattern
         className={cn(
           "[mask-image:radial-gradient(400px_circle_at_center,white,transparent)]",
@@ -234,124 +235,12 @@ export default function Home() {
         )}
       ></InteractiveGridPattern>
             {aleoMarkets.map((market, i) => (
-              <Card key={i} className="bg-[#121212] rounded-lg shadow-sm hover:shadow-md transition-shadow z-20 border-none">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-white">
-                    Market ID: {market.id}
-                  </CardTitle>
-                  <CardDescription className="text-xs text-white">
-                    Question ID: {market.question}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-3">
-                    {/* Status and Basic Info */}
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div>
-                        <span className="text-white">Status:</span>
-                        <Badge className={`ml-1 ${market.status === '0u8' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                          {market.status === '0u8' ? 'Active' : 'Closed'}
-                        </Badge>
-                      </div>
-                      <div>
-                        <span className="text-white">Trades:</span>
-                        <span className="ml-1 font-medium">{safeReplace(market.trade_count, /u32$/, '')}</span>
-                      </div>
-                    </div>
-                    
-                    {/* Creator */}
-                    <div className="text-xs">
-                      <span className="text-white">Creator:</span>
-                      <div className="font-mono text-xs text-white truncate" title={market.creator}>
-                        {market.creator ? `${market.creator.slice(0, 20)}...` : 'N/A'}
-                      </div>
-                    </div>
-                    
-                    {/* Prices Section - More Prominent */}
-                    <div className="bg-[#121212] p-3 rounded-lg">
-                      <div className="text-xs font-semibold text-white mb-2">Current Prices</div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="text-center">
-                          <div className="text-xs text-white mb-1">yes.last_yes_price</div>
-                          <div className="text-lg font-bold text-blue-600">
-                            {market.last_yes_price}
-                          </div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-xs text-white mb-1">no.last_no_price</div>
-                          <div className="text-lg font-bold text-red-600">
-                            {market.last_no_price}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Liquidity Info */}
-                    <div className="bg-[#121212] p-3 rounded-lg">
-                      <div className="text-xs font-semibold text-white mb-2">Liquidity Information</div>
-                      <div className="space-y-1 text-xs">
-                        <div className="flex justify-between">
-                          <span className="text-white">Total Liquidity:</span>
-                          <span className="font-semibold text-white">{formatLiquidity(market.total_liquidity)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-white">Yes Reserve:</span>
-                          <span className="font-medium text-blue-600">{formatLiquidity(market.yes_reserve)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-white">No Reserve:</span>
-                          <span className="font-medium text-red-600">{formatLiquidity(market.no_reserve)}</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Token IDs */}
-                    <div className="text-xs">
-                      <div className="text-white mb-1">Token IDs:</div>
-                      <div className="space-y-1">
-                        <div className="flex justify-between">
-                          <span className="text-blue-600">Yes Token:</span>
-                          <span className="font-mono text-xs text-white" title={market.yes_token_id}>
-                            {market.yes_token_id ? `${market.yes_token_id.slice(0, 12)}...` : 'N/A'}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-red-600">No Token:</span>
-                          <span className="font-mono text-xs text-white" title={market.no_token_id}>
-                            {market.no_token_id ? `${market.no_token_id.slice(0, 12)}...` : 'N/A'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Additional Info */}
-                    <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t">
-                      <div>
-                        <span className="text-white">Closing Block:</span>
-                        <div className="font-medium">{safeReplace(market.closing_block, /u32$/, '')}</div>
-                      </div>
-                      <div>
-                        <span className="text-white">Winning Option:</span>
-                        <div className="font-medium">
-                          {market.winning_option === '0u8' ? 'TBD' : 
-                           market.winning_option === '1u8' ? 'Yes' : 
-                           market.winning_option === '2u8' ? 'No' : 'Unknown'}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Action Badges */}
-                    <div className="flex items-center gap-2 pt-2">
-                      <Badge className="bg-blue-100 text-blue-700 border-none px-2 py-1 flex-1 text-center">
-                        yes: {formatPrice(market.last_yes_price)}
-                      </Badge>
-                      <Badge className="bg-red-100 text-red-700 border-none px-2 py-1 flex-1 text-center">
-                        no: {formatPrice(market.last_no_price)}
-                      </Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <MarketQuestionCard
+                key={i}
+                question={market.question}
+                yesPercent={parseFloat(market.last_yes_price.replace(/u64$/, ''))}
+                noPercent={parseFloat(market.last_no_price.replace(/u64$/, ''))}
+              />
             ))}
           </div>
         ) : (
@@ -372,7 +261,7 @@ export default function Home() {
               height={250}
               minScratchPercentage={70}
               className="flex items-center justify-center overflow-hidden rounded-2xl border-2 bg-gray-100"
-              gradientColors={["#121212", "#121212", "#121212"]}
+              gradientColors={["#111827", "#1f2937", "#111827"]}
             >
               <p className="text-9xl">🕵️</p>
             </ScratchToReveal>
@@ -380,7 +269,7 @@ export default function Home() {
         </div>    
       </section>
 
-      <section className="bg-[#121212] mt-20">
+      <section className="bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700 mt-20">
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col items-start justify-start">
             <h2 className="text-5xl font-bold text-white">How it works</h2>

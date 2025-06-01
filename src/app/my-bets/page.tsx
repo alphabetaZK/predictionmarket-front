@@ -10,6 +10,7 @@ import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
 import { InteractiveGridPattern } from "@/components/magicui/interactive-grid-pattern";
 import { ScratchToReveal } from "@/components/magicui/scratch-to-reveal";
+import { MarketQuestionCard } from "@/components/market-question-card";
 
 interface UserBet {
   id: string;
@@ -319,90 +320,9 @@ export default function MyBets() {
 
       {/* Portfolio Summary */}
       <section className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Example Market Position Card */}
-          <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700 text-white overflow-hidden">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-semibold text-white">Question #123field</CardTitle>
-                <Badge variant="outline" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
-                  Active
-                </Badge>
-              </div>
-              <CardDescription className="text-gray-300 text-sm">
-                Will the event happen before the deadline?
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-green-500/10 rounded-lg p-3 border border-green-500/20">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-green-400 font-medium text-sm">YES Tokens</span>
-                    <span className="text-green-400 text-xs">+2.4%</span>
-                  </div>
-                  <div className="text-white font-bold text-lg">1,250</div>
-                  <div className="text-green-400 text-xs">≈ $875.50</div>
-                </div>
-                <div className="bg-red-500/10 rounded-lg p-3 border border-red-500/20">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-red-400 font-medium text-sm">NO Tokens</span>
-                    <span className="text-red-400 text-xs">-1.2%</span>
-                  </div>
-                  <div className="text-white font-bold text-lg">750</div>
-                  <div className="text-red-400 text-xs">≈ $524.25</div>
-                </div>
-              </div>
-              
-              <div className="border-t border-gray-700 pt-3">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-400">Total Position</span>
-                  <span className="text-white font-semibold">$1,399.75</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Add more cards as needed */}
-          <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700 text-white overflow-hidden">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-semibold text-white">Question #2206field</CardTitle>
-                <Badge variant="outline" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
-                  Active
-                </Badge>
-              </div>
-              <CardDescription className="text-gray-300 text-sm">
-                Market prediction for Q4 results
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-green-500/10 rounded-lg p-3 border border-green-500/20">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-green-400 font-medium text-sm">YES Tokens</span>
-                    <span className="text-green-400 text-xs">+5.7%</span>
-                  </div>
-                  <div className="text-white font-bold text-lg">2,100</div>
-                  <div className="text-green-400 text-xs">≈ $1,470.00</div>
-                </div>
-                <div className="bg-red-500/10 rounded-lg p-3 border border-red-500/20">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-red-400 font-medium text-sm">NO Tokens</span>
-                    <span className="text-red-400 text-xs">-0.8%</span>
-                  </div>
-                  <div className="text-white font-bold text-lg">500</div>
-                  <div className="text-red-400 text-xs">≈ $350.00</div>
-                </div>
-              </div>
-              
-              <div className="border-t border-gray-700 pt-3">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-400">Total Position</span>
-                  <span className="text-white font-semibold">$1,820.00</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="flex gap-6">
+          <MarketQuestionCard question="73418128980065620field" yesPercent={81} noPercent={19} />
+          <MarketQuestionCard question="73418128980065620field" yesPercent={60} noPercent={40} />
         </div>
       </section>
 
