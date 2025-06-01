@@ -6,6 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import { useState, useEffect } from "react";
 import { MarketQuestionCard, decodeQuestion } from "@/components/market-question-card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface MarketData {
   id: string;
@@ -248,18 +254,43 @@ export default function MarketDetailPage() {
 
               <div className="flex flex-wrap gap-4 items-center">
                 <div className="flex gap-4 items-center">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                    <span className="text-green-600 font-semibold">Yes {formatPrice(market.last_yes_price)}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                    <span className="text-red-600 font-semibold">No {formatPrice(market.last_no_price)}</span>
-                  </div>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                        <span className="text-green-600 font-semibold">Yes {formatPrice(market.last_yes_price)}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Current price for Yes tokens. Higher price means higher confidence in Yes outcome.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                        <span className="text-red-600 font-semibold">No {formatPrice(market.last_no_price)}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Current price for No tokens. Higher price means higher confidence in No outcome.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
-                <div className="text-sm text-gray-500">
-                  Trade Count: {market.trade_count.replace('u32', '')}
-                </div>
+
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div className="text-sm text-gray-500">
+                        Trades: {market.trade_count.replace('u32', '')}
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Number of trades executed by users. A market can have liquidity without trades (initial liquidity or market making).</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
             </div>
 
@@ -269,51 +300,156 @@ export default function MarketDetailPage() {
               <div className="lg:col-span-2 space-y-6">
                 {/* Stats Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-white rounded-lg shadow-sm p-4">
-                    <div className="text-sm text-gray-500 mb-1">Total Volume</div>
-                    <div className="font-semibold text-lg truncate" title={formatLiquidity(market.total_liquidity)}>
-                      {formatLiquidity(market.total_liquidity)}
-                    </div>
-                  </div>
-                  <div className="bg-white rounded-lg shadow-sm p-4">
-                    <div className="text-sm text-gray-500 mb-1">Yes Reserve</div>
-                    <div className="font-semibold text-lg truncate" title={formatLiquidity(market.yes_reserve)}>
-                      {formatLiquidity(market.yes_reserve)}
-                    </div>
-                  </div>
-                  <div className="bg-white rounded-lg shadow-sm p-4">
-                    <div className="text-sm text-gray-500 mb-1">No Reserve</div>
-                    <div className="font-semibold text-lg truncate" title={formatLiquidity(market.no_reserve)}>
-                      {formatLiquidity(market.no_reserve)}
-                    </div>
-                  </div>
-                  <div className="bg-white rounded-lg shadow-sm p-4">
-                    <div className="text-sm text-gray-500 mb-1">Closing Block</div>
-                    <div className="font-semibold text-lg">
-                      {market.closing_block.replace('u32', '')}
-                    </div>
-                  </div>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger className="w-full">
+                        <div className="bg-white rounded-lg shadow-sm p-4 h-full">
+                          <div className="text-sm text-gray-500 mb-1">Total Liquidity</div>
+                          <div className="font-semibold text-lg truncate" title={formatLiquidity(market.total_liquidity)}>
+                            {formatLiquidity(market.total_liquidity)}
+                          </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Total amount of ALEO tokens locked in the market. This represents the total value available for trading.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger className="w-full">
+                        <div className="bg-white rounded-lg shadow-sm p-4 h-full">
+                          <div className="text-sm text-gray-500 mb-1">Yes Pool</div>
+                          <div className="font-semibold text-lg truncate" title={formatLiquidity(market.yes_reserve)}>
+                            {formatLiquidity(market.yes_reserve)}
+                          </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Amount of ALEO tokens in the Yes pool. Larger pool means higher Yes token price.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger className="w-full">
+                        <div className="bg-white rounded-lg shadow-sm p-4 h-full">
+                          <div className="text-sm text-gray-500 mb-1">No Pool</div>
+                          <div className="font-semibold text-lg truncate" title={formatLiquidity(market.no_reserve)}>
+                            {formatLiquidity(market.no_reserve)}
+                          </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Amount of ALEO tokens in the No pool. Larger pool means higher No token price.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger className="w-full">
+                        <div className="bg-white rounded-lg shadow-sm p-4 h-full">
+                          <div className="text-sm text-gray-500 mb-1">Closing Block</div>
+                          <div className="font-semibold text-lg">
+                            {market.closing_block.replace('u32', '')}
+                          </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>The Aleo block number when this market will close and resolve.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
 
                 {/* Market Info */}
                 <div className="bg-white rounded-lg shadow-sm p-6">
                   <h2 className="text-lg font-semibold mb-4">Market Information</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <div className="text-gray-500 mb-1">Creator</div>
-                      <div className="truncate font-medium" title={market.creator}>{market.creator}</div>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger className="w-full text-left">
+                          <div>
+                            <div className="text-gray-500 mb-1">Creator</div>
+                            <div className="truncate font-medium" title={market.creator}>{market.creator}</div>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>The Aleo address that created this prediction market</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger className="w-full text-left">
+                          <div>
+                            <div className="text-gray-500 mb-1">Yes Token ID</div>
+                            <div className="truncate font-medium" title={market.yes_token_id}>{market.yes_token_id}</div>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Unique identifier for the Yes tokens in this market</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger className="w-full text-left">
+                          <div>
+                            <div className="text-gray-500 mb-1">No Token ID</div>
+                            <div className="truncate font-medium" title={market.no_token_id}>{market.no_token_id}</div>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Unique identifier for the No tokens in this market</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger className="w-full text-left">
+                          <div>
+                            <div className="text-gray-500 mb-1">Market ID</div>
+                            <div className="truncate font-medium" title={market.id}>{market.id}</div>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Unique identifier for this prediction market</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                </div>
+
+                {/* How It Works Section */}
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                  <h2 className="text-lg font-semibold mb-4">How This Market Works</h2>
+                  <div className="space-y-4 text-sm text-gray-600">
+                    <p>
+                      This is a prediction market where you can trade Yes/No tokens based on your prediction of the outcome.
+                    </p>
+                    <div className="space-y-2">
+                      <h3 className="font-medium text-gray-900">Understanding Prices</h3>
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Yes token price increases when more people buy Yes tokens</li>
+                        <li>No token price increases when more people buy No tokens</li>
+                        <li>Prices are determined by the ratio of tokens in each pool</li>
+                      </ul>
                     </div>
-                    <div>
-                      <div className="text-gray-500 mb-1">Yes Token ID</div>
-                      <div className="truncate font-medium" title={market.yes_token_id}>{market.yes_token_id}</div>
-                    </div>
-                    <div>
-                      <div className="text-gray-500 mb-1">No Token ID</div>
-                      <div className="truncate font-medium" title={market.no_token_id}>{market.no_token_id}</div>
-                    </div>
-                    <div>
-                      <div className="text-gray-500 mb-1">Market ID</div>
-                      <div className="truncate font-medium" title={market.id}>{market.id}</div>
+                    <div className="space-y-2">
+                      <h3 className="font-medium text-gray-900">Understanding Pools</h3>
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Yes Pool: Contains ALEO tokens backing Yes predictions</li>
+                        <li>No Pool: Contains ALEO tokens backing No predictions</li>
+                        <li>Total Liquidity: Sum of both pools, representing total market value</li>
+                        <li>Initial liquidity is required to start the market, even before any trades occur</li>
+                      </ul>
                     </div>
                   </div>
                 </div>
