@@ -23,7 +23,7 @@ const categories = [
   "All markets", "Featured", "US Politics", "Sports", "World Politics", "Russia/Ukraine", "Current Events", "Economics", "Science"
 ];
 
-const list_open_markets_id = ['73418128980065620field', '73418128980065620field', '73418128980065620field', '73418128980065620field', '73418128980065620field', '73418128980065620field'];
+const list_open_markets_id = ['2927529426311100field', '73418128980065620field', '73418128980065620field', '73418128980065620field', '73418128980065620field', '73418128980065620field'];
 
 interface MarketData {
   id: string;

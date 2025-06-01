@@ -6,7 +6,7 @@ interface MarketQuestionCardProps {
   noPercent: number;
 }
 
-const ALPHABET = " abcdefghijklmnopqrstuvwxyz";
+const ALPHABET = " abcdefghijklmnopqrstuvwxyzàâäéèêëîïôöùûüÿçñ-?";
 const BASE = ALPHABET.length;
 
 export function decodeQuestion(question: string): string {
@@ -15,16 +15,14 @@ export function decodeQuestion(question: string): string {
     if (question.endsWith('field')) {
       questionToDecode = question.slice(0, -5);
     }
-    if (typeof questionToDecode === 'number' || /^(\d+)$/.test(questionToDecode)) {
-      const number = parseInt(questionToDecode);
-      if (number === 0) return ALPHABET[0];
-      
+    if (/^(\d+)$/.test(questionToDecode)) {
+      let n = BigInt(questionToDecode);
+      if (n === 0n) return ALPHABET[0];
       let chars = [];
-      let n = number;
-      while (n > 0) {
-        const rem = n % BASE;
-        chars.push(ALPHABET[rem]);
-        n = Math.floor(n / BASE);
+      while (n > 0n) {
+        const rem = n % BigInt(BASE);
+        chars.push(ALPHABET[Number(rem)]);
+        n = n / BigInt(BASE);
       }
       return chars.reverse().join('');
     }

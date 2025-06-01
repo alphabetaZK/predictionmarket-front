@@ -40,18 +40,17 @@ export const Conversation = forwardRef((props, ref) => {
                     console.warn("No credit records found, but attempting transaction anyway.");
                   }
                   // Encoder
-                  const ALPHABET = " abcdefghijklmnopqrstuvwxyz-?";
+                  const ALPHABET = " abcdefghijklmnopqrstuvwxyzàâäéèêëîïôöùûüÿçñ-?";
                   const BASE = ALPHABET.length;
                   function encode(text: string) {
-                    // Met en minuscules et ne garde que les lettres a-z, l'espace, '-' et '?'
-                    const cleaned = text.toLowerCase().replace(/[^a-z \-\?]/g, '').slice(0, 35);
-                    let number = 0;
+                    const cleaned = text.toLowerCase().replace(/[^a-zàâäéèêëîïôöùûüÿçñ \-\?]/g, '').slice(0, 35);
+                    let number = 0n;
                     for (const char of cleaned) {
-                      const index = ALPHABET.indexOf(char);
-                      if (index === -1) throw new Error(`Invalid character: ${char}`);
-                      number = number * BASE + index;
+                      const index = BigInt(ALPHABET.indexOf(char));
+                      if (index === -1n) throw new Error(`Invalid character: ${char}`);
+                      number = number * BigInt(BASE) + index;
                     }
-                    return number;
+                    return number.toString();
                   }
                   // Prépare les inputs
                   const PREDICTION_MARKET_PROGRAM = "prediction_market_paris_v5.aleo";
