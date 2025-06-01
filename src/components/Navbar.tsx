@@ -4,6 +4,7 @@ import { WalletMultiButton } from "@demox-labs/aleo-wallet-adapter-reactui";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import Link from "next/link";
+
 export default function Navbar() {
   return (
     <nav className="text-black border-b">
@@ -15,7 +16,8 @@ export default function Navbar() {
             </Link>
           </div>
           <div className="hidden md:flex gap-6 text-sm font-medium">
-            <a href="#" className="hover:text-blue-400">Leaderboard</a>
+            <Link href="/my-bets" className="hover:text-blue-400">My Bets</Link>
+            <Link href="/create-market" className="hover:text-blue-400">Create Market</Link>
             <a href="#" className="hover:text-blue-400">FAQ</a>
           </div>
         </div>
