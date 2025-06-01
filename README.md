@@ -75,11 +75,10 @@ Unit tests can be added using Jest or Vitest, depending on project setup.
 
 ## 👨‍💻 Team
 
-- **Ramzy** – Lead Frontend Developer  
-- **Lina** – UI/UX Designer  
-- **Mathieu** – Wallet integration & ZK logic  
-- **Salim** – Smart contract liaison  
-- **Abdellahi** – Testing & game theory
+- **Ramzy** – ZK logic 
+- **Lina** – UI/UX Designer & Smart Contract liaison
+- **Salim** – Frontend & AI
+- **Abdellahi** – Testing & business part
 
 ## 📩 Contact / Support
 
